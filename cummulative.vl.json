@@ -1,0 +1,79 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "width": 800,
+  "height": 500,
+  "title": "Cummulative cases by ZIP (Updated 2020-11-04)",
+  "data": {
+    "url": "data/pdxzip.topo.json",
+    "format": {
+      "type": "topojson",
+      "feature": "pdxzip"
+    }
+  },
+  "transform": [
+    {
+      "lookup": "properties.ZIPCODE",
+      "from": {
+        "data": { "url": "data/zipcode/2020-11-04.csv" },
+        "key": "zip_code",
+        "fields": ["cases", "cases_norm"]
+      }
+    }
+  ],
+  "config": {
+    "geoshape": {
+      "color": "lightgrey",
+      "stroke": "lightgrey"
+    }
+  },
+  "layer": [
+    {
+      "mark": "geoshape",
+
+      "encoding": {
+        "color": {
+          "field": "cases_norm",
+          "type": "quantitative",
+          "title": "Cases per 100k residents"
+        },
+        "tooltip": [
+          {
+            "field": "properties.NAME",
+            "type": "nominal",
+            "title": "Area"
+          },
+          {
+            "field": "properties.ZIPCODE",
+            "type": "nominal",
+            "title": "ZIP"
+          },
+          {
+            "field": "cases",
+            "type": "quantitative",
+            "title": "Cummulative Cases"
+          },
+          {
+            "field": "cases_norm",
+            "type": "quantitative",
+            "title": "Cases per 100k"
+          }
+        ]
+      }
+    },
+    {
+      "data": {
+        "values": [{ "label": "Portland", "lat": 45.5372, "lon": -122.65 }]
+      },
+      "layer": [
+        {
+          "mark": "text",
+          "encoding": {
+            "text": { "field": "label" },
+            "latitude": { "field": "lat" },
+            "longitude": { "field": "lon" }
+          }
+        }
+      ]
+    }
+  ]
+}
