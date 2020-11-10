@@ -4,7 +4,7 @@
     <title>Portland, Oregon Metro COVID-19 by Zip Code Map (updated weekly)</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Portland, Oregon Metro COVID-19 by Zip Code Map. Contribute to junosuarez/pdx-metro-covid-zip-map development by creating an account on GitHub.">
-    <meta property="og:image" content="https://junosuarez.github.io/pdx-metro-covid-zip-map/cummulative-2020-11-04.png">
+    <meta property="og:image" content="https://junosuarez.github.io/pdx-metro-covid-zip-map/cumulative-2020-11-04.png">
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -20,7 +20,7 @@
     <p><a href="https://github.com/junosuarez/pdx-metro-covid-zip-map">Source code on GitHub</a>.</p>
     <script>
       async function main() {
-        const res = await fetch("./cummulative.vl.json")
+        const res = await fetch("./cumulative.vl.json")
         const spec = await res.json()
 
         vegaEmbed('#vis', spec);
