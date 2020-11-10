@@ -3,13 +3,21 @@
   <head>
     <title>Portland, Oregon Metro COVID-19 by Zip Code Map (updated weekly)</title>
     <meta name="viewport" content="width=device-width">
+    <meta name="description" content="Portland, Oregon Metro COVID-19 by Zip Code Map. Contribute to junosuarez/pdx-metro-covid-zip-map development by creating an account on GitHub.">
+    <meta property="og:image" content="https://junosuarez.github.io/pdx-metro-covid-zip-map/cummulative-2020-11-04.png">
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
   </head>
   <body>
     <div id="vis"></div>
-    <div><a href="https://github.com/junosuarez/pdx-metro-covid-zip-map">Source code on GitHub</a></div>
+    <h2>Data Sources</h2>
+    <p>These data are provided as-is with no warranty expressed or implied.</p>
+    <p>Case data from <a href="https://govstatus.egov.com/OR-OHA-COVID-19" rel="nofollow">Oregon Health Authority</a>. OHA releases zipcode level data weekly (usually on Wednesdays) in their <a href="https://www.oregon.gov/oha/covid19/Pages/Healthcare-Partners.aspx#projections" rel="nofollow">Oregon COVID-19 Weekly Report</a>.</p>
+    <p>This data is extracted from the PDF using <a href="https://tabula.technology/" rel="nofollow">Tabula</a> and manually spot checked.</p>
+    <p>Zipcode shapes come from Metro's GIS PDX open data site <a href="https://gis-pdx.opendata.arcgis.com/datasets/71fa9b7ab6a040939d7c0339287fa436_1" rel="nofollow">Zip Code Boundaries feature layer</a>, converted to Web Mercator coordinates via gdal. Disclaimer, <a href="http://www.georeference.org/doc/zip_codes_are_not_areas.htm" rel="nofollow">ZIP codes are not areas</a>.</p>
+
+    <p><a href="https://github.com/junosuarez/pdx-metro-covid-zip-map">Source code on GitHub</a>.</p>
     <script>
       async function main() {
         const res = await fetch("./cummulative.vl.json")
