@@ -28,8 +28,14 @@
           let zip_code = location.hash.replace('#','')
           view.signal("activeZip_zip_code", zip_code).run()
 
-          view.tooltip(function (handler, event, item, value) {
-            zip_code = item && item.datum && item.datum.zip_code
+          // view.tooltip(function (handler, event, item, value) {
+          //   zip_code = item && item.datum && item.datum.zip_code
+          //   history.replaceState(null,zip_code,`#${zip_code}`)
+          //   view.signal("activeZip_zip_code", zip_code).run()
+          // })
+
+          view.addEventListener('click', function (e, item) {
+              zip_code = item && item.datum && item.datum.zip_code
             history.replaceState(null,zip_code,`#${zip_code}`)
             view.signal("activeZip_zip_code", zip_code).run()
           })

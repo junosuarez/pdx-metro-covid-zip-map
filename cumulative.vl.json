@@ -136,8 +136,7 @@
             "x": { "field": "week", "type": "temporal" },
             "y": {
               "field": "cases",
-              "type": "quantitative",
-              "aggregate": "sum"
+              "type": "quantitative"
             }
           }
         },

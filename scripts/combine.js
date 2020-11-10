@@ -37,7 +37,7 @@ async function main() {
       // we replace them with 5, numerically, to get things to be visible
       // at this point in the pandemic, there are enough cases overall
       // to where this is, sadly, not problematic for visualization purposes
-      if (row.cases === "1-9") {
+      if (["1-9", "1–9", "1–-9"].includes(row.cases)) {
         row.cases = 5;
       }
 
