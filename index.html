@@ -35,9 +35,11 @@
           // })
 
           view.addEventListener('click', function (e, item) {
-              zip_code = item && item.datum && item.datum.zip_code
-            history.replaceState(null,zip_code,`#${zip_code}`)
-            view.signal("activeZip_zip_code", zip_code).run()
+            zip_code = item && item.datum && item.datum.zip_code
+            if (zip_code) {
+              history.replaceState(null,zip_code,`#${zip_code}`)
+              view.signal("activeZip_zip_code", zip_code).run()
+            }
           })
         })
       }
