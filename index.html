@@ -23,7 +23,16 @@
         const res = await fetch("./cumulative.vl.json")
         const spec = await res.json()
 
-        vegaEmbed('#vis', spec);
+        vegaEmbed('#vis', spec).then(({view}) => {
+          let zip_code = location.hash.replace('#','')
+          view.signal("activeZip_zip_code", zip_code).run()
+
+          view.tooltip(function (handler, event, item, value) {
+            zip_code = item && item.datum && item.datum.zip_code
+            history.replaceState(null,zip_code,`#${zip_code}`)
+            view.signal("activeZip_zip_code", zip_code).run()
+          })
+        })
       }
       main()
     </script>
