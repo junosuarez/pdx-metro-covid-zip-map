@@ -3,75 +3,216 @@
   "width": 800,
   "height": 500,
   "title": "Cumulative cases by ZIP (Updated 2020-11-04)",
-  "data": {
-    "url": "data/zipcode_boundaries/zipcode_boundaries.json",
-    "format": {
-      "type": "topojson",
-      "feature": "zipcode_boundaries"
-    }
-  },
-  "transform": [
+  "data": { "url": "data/zipcode/combined.csv" },
+  "vconcat": [
     {
-      "lookup": "properties.ZIPCODE",
-      "from": {
-        "data": { "url": "data/zipcode/2020-11-04.csv" },
-        "key": "zip_code",
-        "fields": ["cases", "cases_norm"]
-      }
-    }
-  ],
-  "config": {
-    "geoshape": {
-      "color": "lightgrey",
-      "stroke": "lightgrey"
-    }
-  },
-  "layer": [
-    {
-      "mark": "geoshape",
-
-      "encoding": {
-        "color": {
-          "field": "cases_norm",
-          "type": "quantitative",
-          "title": "Cases per 100k residents"
-        },
-        "tooltip": [
-          {
-            "field": "properties.NAME",
-            "type": "nominal",
-            "title": "Area"
-          },
-          {
-            "field": "properties.ZIPCODE",
-            "type": "nominal",
-            "title": "ZIP"
-          },
-          {
-            "field": "cases",
-            "type": "quantitative",
-            "title": "Cumulative Cases"
-          },
-          {
-            "field": "cases_norm",
-            "type": "quantitative",
-            "title": "Cases per 100k"
+      "height": 300,
+      "width": 500,
+      "transform": [
+        {
+          "lookup": "zip_code",
+          "from": {
+            "data": {
+              "url": "data/zipcode_boundaries/zipcode_boundaries.json",
+              "format": {
+                "type": "topojson",
+                "feature": "zipcode_boundaries"
+              }
+            },
+            "key": "properties.ZIPCODE",
+            "as": "_lookup"
           }
-        ]
-      }
-    },
-    {
-      "data": {
-        "values": [{ "label": "Portland", "lat": 45.5372, "lon": -122.65 }]
+        },
+        { "filter": "isValid(datum._lookup)" },
+        { "calculate": "datum._lookup.properties.NAME", "as": "name" },
+        { "filter": { "selection": "index" } }
+      ],
+      "config": {
+        "geoshape": {
+          "color": "lightgrey",
+          "stroke": "lightgrey"
+        }
       },
       "layer": [
         {
+          "selection": {
+            "activeZip": {
+              "type": "single",
+              "fields": ["zip_code"],
+              "bind": {
+                "input": "text",
+                "name": "Search ",
+                "placeholder": "zip code",
+                "debounce": 50
+              }
+            }
+          },
+          "mark": "geoshape",
+          "encoding": {
+            "shape": {
+              "field": "_lookup",
+              "type": "geojson"
+            },
+            "color": {
+              "field": "cases_norm",
+              "type": "quantitative",
+              "title": "Cases per 100k residents"
+            },
+            "stroke": {
+              "condition": {
+                "test": {
+                  "and": [
+                    { "selection": "activeZip" },
+                    "isValid(activeZip.zip_code)"
+                  ]
+                },
+                "value": "orange"
+              },
+              "value": null
+            },
+            "tooltip": [
+              {
+                "field": "name",
+                "type": "nominal",
+                "title": "Area"
+              },
+              {
+                "field": "zip_code",
+                "type": "nominal",
+                "title": "ZIP"
+              },
+              {
+                "field": "cases",
+                "type": "quantitative",
+                "title": "Cumulative cases"
+              },
+              {
+                "field": "cases_change",
+                "type": "quantitative",
+                "title": "New cases"
+              },
+              {
+                "field": "cases_norm",
+                "type": "quantitative",
+                "title": "Cases per 100k"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "values": [{ "label": "Portland", "lat": 45.5372, "lon": -122.65 }]
+          },
+          "layer": [
+            {
+              "mark": "text",
+              "encoding": {
+                "text": { "field": "label" },
+                "latitude": { "field": "lat" },
+                "longitude": { "field": "lon" }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "height": 100,
+      "width": 500,
+      "transform": [{ "filter": { "selection": "activeZip" } }],
+      "encoding": {
+        "x": { "field": "week", "type": "temporal" }
+      },
+      "layer": [
+        {
+          "mark": "line",
+          "encoding": {
+            "x": { "field": "week", "type": "temporal" },
+            "y": {
+              "field": "cases",
+              "type": "quantitative",
+              "aggregate": "sum"
+            }
+          }
+        },
+        {
+          "selection": {
+            "index": {
+              "type": "single",
+              "on": "mousemove",
+              "encodings": ["x"],
+              "nearest": true,
+              "resolve": "global"
+            }
+          },
+          "mark": { "type": "point" },
+          "encoding": {
+            "x": { "field": "week", "type": "temporal" },
+            "opacity": { "value": 0 }
+          }
+        },
+        {
+          "mark": "rule",
+          "transform": [{ "filter": { "selection": "index" } }],
+          "encoding": { "color": { "value": "orange" } }
+        },
+        {
+          "transform": [
+            {
+              "filter": {
+                "and": ["index.week", { "selection": "index" }]
+              }
+            }
+          ],
           "mark": "text",
           "encoding": {
-            "text": { "field": "label" },
-            "latitude": { "field": "lat" },
-            "longitude": { "field": "lon" }
+            "y": { "value": -10 },
+            "text": { "field": "week", "type": "temporal" }
           }
+        }
+      ]
+    },
+    {
+      "height": 100,
+      "width": 500,
+      "transform": [{ "filter": { "selection": "activeZip" } }],
+      "encoding": {
+        "x": { "field": "week", "type": "temporal" }
+      },
+      "layer": [
+        {
+          "mark": "line",
+          "encoding": {
+            "x": { "field": "week", "type": "temporal" },
+            "y": {
+              "field": "cases_change",
+              "type": "quantitative",
+              "aggregate": "sum",
+              "title": "New cases (wk)"
+            }
+          }
+        },
+        {
+          "selection": {
+            "index": {
+              "type": "single",
+              "on": "mousemove",
+              "encodings": ["x"],
+              "nearest": true,
+              "resolve": "global",
+              "init": { "week": "2020-11-04" }
+            }
+          },
+          "mark": { "type": "point" },
+          "encoding": {
+            "x": { "field": "week", "type": "temporal" },
+            "opacity": { "value": 0 }
+          }
+        },
+        {
+          "mark": "rule",
+          "transform": [{ "filter": { "selection": "index" } }],
+          "encoding": { "color": { "value": "orange" } }
         }
       ]
     }
