@@ -33,6 +33,12 @@
           "stroke": "lightgrey"
         }
       },
+      "projection": {
+        "type": "mercator",
+        "scale": 20000,
+        "translate": [280, 100],
+        "center": [-122.65, 45.5372]
+      },
       "layer": [
         {
           "selection": {

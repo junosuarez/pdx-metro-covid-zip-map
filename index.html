@@ -24,6 +24,7 @@
         const spec = await res.json()
 
         vegaEmbed('#vis', spec).then(({view}) => {
+          window.view = view
           let zip_code = location.hash.replace('#','')
           view.signal("activeZip_zip_code", zip_code).run()
 
