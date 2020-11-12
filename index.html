@@ -20,7 +20,7 @@
     <p><a href="https://github.com/junosuarez/pdx-metro-covid-zip-map">Source code on GitHub</a>.</p>
     <script>
       async function main() {
-        const res = await fetch("./cumulative.vl.json")
+        const res = await fetch("./cumulative.vl.json?2020-11-12")
         const spec = await res.json()
 
         vegaEmbed('#vis', spec).then(({view}) => {
