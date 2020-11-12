@@ -3,7 +3,10 @@
   "width": 800,
   "height": 500,
   "title": "Cumulative cases by ZIP (Updated 2020-11-12)",
-  "data": { "url": "data/zipcode/combined.csv?2020-11-12" },
+  "data": {
+    "url": "data/zipcode/combined.csv?2020-11-12",
+    "format": { "type": "csv" }
+  },
   "vconcat": [
     {
       "height": 300,
