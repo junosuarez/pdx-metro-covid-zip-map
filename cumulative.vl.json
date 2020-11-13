@@ -2,7 +2,11 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
   "width": 800,
   "height": 500,
-  "title": "Cumulative cases by ZIP (Updated 2020-11-12)",
+  "title": {
+    "text": {
+      "expr": "'Cumulative cases by ZIP (Updated ' + utcFormat(peek(data('source_0')).week, '%B %d, %Y') + ')'"
+    }
+  },
   "data": {
     "url": "data/zipcode/combined.csv?2020-11-12",
     "format": { "type": "csv" }
@@ -28,6 +32,16 @@
         },
         { "filter": "isValid(datum._lookup)" },
         { "calculate": "datum._lookup.properties.NAME", "as": "name" },
+        { "calculate": "toNumber(datum.cases_norm)", "as": "cases_norm_n" },
+        {
+          "joinaggregate": [
+            {
+              "op": "max",
+              "field": "cases_norm_n",
+              "as": "cases_norm_max"
+            }
+          ]
+        },
         { "filter": { "selection": "index" } }
       ],
       "config": {
@@ -50,7 +64,7 @@
               "fields": ["zip_code"],
               "bind": {
                 "input": "text",
-                "name": "Search ",
+                "name": "Search zip code ",
                 "placeholder": "zip code",
                 "debounce": 50
               }
@@ -63,9 +77,13 @@
               "type": "geojson"
             },
             "color": {
-              "field": "cases_norm",
+              "field": "cases_norm_n",
               "type": "quantitative",
-              "title": "Cases per 100k residents"
+              "title": "Cases per 100k residents",
+              "scale": {
+                "type": "linear",
+                "domain": [1, { "expr": "data('data_0')[0].cases_norm_max" }]
+              }
             },
             "stroke": {
               "condition": {
@@ -126,6 +144,21 @@
       ]
     },
     {
+      "view": {
+        "stroke": null
+      },
+      "mark": {
+        "type": "text"
+      },
+      "encoding": {
+        "text": {
+          "value": {
+            "expr": "toString(activeZip.zip_code) ? 'Showing ' + toString(activeZip.zip_code) : 'Click to select a zipcode'"
+          }
+        }
+      }
+    },
+    {
       "height": 100,
       "width": 500,
       "transform": [{ "filter": { "selection": "activeZip" } }],
@@ -161,7 +194,13 @@
         },
         {
           "mark": "rule",
-          "transform": [{ "filter": { "selection": "index" } }],
+          "transform": [
+            {
+              "filter": {
+                "and": ["index.week", { "selection": "index" }]
+              }
+            }
+          ],
           "encoding": { "color": { "value": "orange" } }
         },
         {
@@ -208,7 +247,11 @@
               "encodings": ["x"],
               "nearest": true,
               "resolve": "global",
-              "init": { "week": "2020-11-12" }
+              "bind": {
+                "input": "text",
+                "name": "Week ",
+                "debounce": 50
+              }
             }
           },
           "mark": { "type": "point" },
@@ -219,7 +262,13 @@
         },
         {
           "mark": "rule",
-          "transform": [{ "filter": { "selection": "index" } }],
+          "transform": [
+            {
+              "filter": {
+                "and": ["index.week", { "selection": "index" }]
+              }
+            }
+          ],
           "encoding": { "color": { "value": "orange" } }
         }
       ]

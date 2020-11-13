@@ -8,6 +8,11 @@
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <style>
+      .vega-bind:first-of-type {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div id="vis"></div>
@@ -25,14 +30,13 @@
 
         vegaEmbed('#vis', spec).then(({view}) => {
           window.view = view
+          // restore the zipcode selection from url hash, if any
           let zip_code = location.hash.replace('#','')
-          view.signal("activeZip_zip_code", zip_code).run()
+          zip_code && view.signal("activeZip_zip_code", zip_code)
 
-          // view.tooltip(function (handler, event, item, value) {
-          //   zip_code = item && item.datum && item.datum.zip_code
-          //   history.replaceState(null,zip_code,`#${zip_code}`)
-          //   view.signal("activeZip_zip_code", zip_code).run()
-          // })
+          // default the week selection to the most recent week available
+          view.signal("index_week", view.data("source_0")[view.data("source_0").length-1].week).run()
+
 
           view.addEventListener('click', function (e, item) {
             zip_code = item && item.datum && item.datum.zip_code
