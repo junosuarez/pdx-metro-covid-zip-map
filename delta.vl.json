@@ -4,7 +4,7 @@
   "height": 500,
   "title": {
     "text": {
-      "expr": "'Cumulative cases by ZIP (Updated ' + utcFormat(peek(data('source_0')).week, '%B %d, %Y') + ')'"
+      "expr": "'New cases in past 2 weeks by ZIP (Updated ' + utcFormat(peek(data('source_0')).week, '%B %d, %Y') + ')'"
     }
   },
   "data": {
@@ -32,13 +32,23 @@
         },
         { "filter": "isValid(datum._lookup)" },
         { "calculate": "datum._lookup.properties.NAME", "as": "name" },
-        { "calculate": "toNumber(datum.cases_norm)", "as": "cases_norm_n" },
+        {
+          "window": [
+            {
+              "op": "sum",
+              "field": "cases_change",
+              "as": "cases_change_2wk"
+            }
+          ],
+          "frame": [-1, 0],
+          "groupby": ["zip_code"]
+        },
         {
           "joinaggregate": [
             {
               "op": "max",
-              "field": "cases_norm_n",
-              "as": "cases_norm_max"
+              "field": "cases_change_2wk",
+              "as": "cases_change_2wk_max"
             }
           ]
         },
@@ -77,12 +87,17 @@
               "type": "geojson"
             },
             "color": {
-              "field": "cases_norm_n",
+              "field": "cases_change_2wk",
               "type": "quantitative",
-              "title": "Cases per 100k residents",
+              "title": "New cases (2wk)",
               "scale": {
                 "type": "linear",
-                "domain": [1, { "expr": "data('data_0')[0].cases_norm_max" }]
+                "domain": [
+                  1,
+                  { "expr": "data('data_0')[0].cases_change_2wk_max" }
+                ],
+                "scheme": "plasma",
+                "reverse": true
               }
             },
             "stroke": {
@@ -114,9 +129,14 @@
                 "title": "Cumulative cases"
               },
               {
+                "field": "cases_change_2wk",
+                "type": "quantitative",
+                "title": "New cases past 2 weeks"
+              },
+              {
                 "field": "cases_change",
                 "type": "quantitative",
-                "title": "New cases"
+                "title": "New cases this week"
               },
               {
                 "field": "cases_norm",
@@ -177,10 +197,10 @@
           "encoding": {
             "x": { "field": "week", "type": "temporal" },
             "y": {
-              "field": "cases",
+              "field": "cases_change",
               "type": "quantitative",
               "aggregate": "sum",
-              "title": "Cumulative cases"
+              "title": "New cases (wk)"
             }
           }
         },
@@ -191,7 +211,12 @@
               "on": "mousemove",
               "encodings": ["x"],
               "nearest": true,
-              "resolve": "global"
+              "resolve": "global",
+              "bind": {
+                "input": "text",
+                "name": "Week ",
+                "debounce": 50
+              }
             }
           },
           "mark": { "type": "point" },
@@ -246,10 +271,10 @@
           "encoding": {
             "x": { "field": "week", "type": "temporal" },
             "y": {
-              "field": "cases_change",
+              "field": "cases",
               "type": "quantitative",
               "aggregate": "sum",
-              "title": "New cases (wk)"
+              "title": "Cumulative cases"
             }
           }
         },
@@ -260,12 +285,7 @@
               "on": "mousemove",
               "encodings": ["x"],
               "nearest": true,
-              "resolve": "global",
-              "bind": {
-                "input": "text",
-                "name": "Week ",
-                "debounce": 50
-              }
+              "resolve": "global"
             }
           },
           "mark": { "type": "point" },

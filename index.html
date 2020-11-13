@@ -25,11 +25,14 @@
     <p><a href="https://github.com/junosuarez/pdx-metro-covid-zip-map">Source code on GitHub</a>.</p>
     <script>
       async function main() {
-        const res = await fetch("./cumulative.vl.json?2020-11-12")
+        const res = await fetch("./delta.vl.json?2020-11-12")
         const spec = await res.json()
 
         vegaEmbed('#vis', spec).then(({view}) => {
           window.view = view
+
+          view.addSignalListener('activeZip_zip_code', (k, v) => console.log(k, v))
+
           // restore the zipcode selection from url hash, if any
           let zip_code = location.hash.replace('#','')
           zip_code && view.signal("activeZip_zip_code", zip_code)
@@ -39,11 +42,13 @@
 
 
           view.addEventListener('click', function (e, item) {
+            const prev = zip_code
             zip_code = item && item.datum && item.datum.zip_code
-            if (zip_code) {
-              history.replaceState(null,zip_code,`#${zip_code}`)
-              view.signal("activeZip_zip_code", zip_code).run()
-            }
+            console.log('click', prev, zip_code)
+            // clicking the same zip toggles it off
+            if (prev === zip_code) { zip_code = ""}
+            history.replaceState(null,zip_code,`#${zip_code}`)
+            view.signal("activeZip_zip_code", zip_code).run()
           })
         })
       }
