@@ -47,7 +47,7 @@ async function main() {
       // calculate week-over-week delta per row
       const prevWeek = prevWeekIdx[row.zip_code] ?? zeroRow;
       prevWeekIdx[row.zip_code] = row;
-      row.cases_change = row.cases - prevWeek.cases || 0;
+      row.cases_change = prevWeek.cases === 0 ? 0 : row.cases - prevWeek.cases;
       row.cases_norm_change = row.cases_norm - prevWeek.cases_norm || 0;
 
       out.push(row);
